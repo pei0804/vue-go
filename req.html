@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Vue TEST</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        #app .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h2>GET /accounts</h2>
+    <input type="text" v-model="listAccountsParam.q">
+    <button v-on:click="listAccounts()">サーチ</button>
+    <table>
+        <tr v-for="account in accounts">
+            <th>{{account.id}}</th>
+            <td>{{account.name}}</td>
+        </tr>
+    </table>
+    <h2>POST /accounts</h2>
+    <input type="text" v-model="addAccountParam.name">
+    <button v-on:click="addAccount()">追加</button>
+    <p v-text="addAccountParam.id">を追加しました</p>
+</div>
+<script>
+    const BASE_URI = "localhost:8080/api/v1";
+    const SCHEME = "http://";
+
+    function getApiUrl(path) {
+        return SCHEME + BASE_URI + path
+    }
+
+    let app = new Vue({
+        el: '#app',
+        data: {
+            accounts: [],
+            listAccountsParam: {
+                q: "",
+            },
+            addAccountParam: {
+                id: 0,
+                name: "",
+            }
+        },
+        methods: {
+            listAccounts() {
+                axios.get(getApiUrl("/accounts"), {
+                    params: {
+                        q: this.listAccountsParam.q,
+                    }
+                }).then(response => {
+                    this.accounts = response.data;
+                }).catch(error => {
+                    console.log("error:" + error);
+                })
+            },
+            addAccount() {
+                axios.post(getApiUrl("/accounts"), {
+                    name: this.addAccountParam.name,
+                }).then(response => {
+                    this.addAccountParam.id = response.data.id;
+                }).catch(error => {
+                    console.log("error:" + error);
+                })
+            }
+        }
+        // application/x-www-form-urlencodedで送る場合
+        // var params = new URLSearchParams();
+        // params.append('param1', 'value1');
+        // params.append('param2', 'value2');
+        // axios.post('/foo', params);
+    })
+</script>

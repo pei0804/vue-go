@@ -4,14 +4,33 @@
     <meta charset="utf-8">
     <title>Vue TEST</title>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <style></style>
+    <style>
+        #app .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-
-<div id="app-1">{{ message }}</div>
-
+<div id="app">
+    <input type="text" v-model="message">
+    <div class="error" v-if="error.require">必須項目です。</div>
+    <div class="error" v-if="error.tooLong">長すぎます。</div>
+</div>
 <script>
+    var app = new Vue({
+        el: '#app',
+        watch: {
+            message: function(newVal, oldVal) {
+                this.error.require = (newVal.length < 1);
+                this.error.tooLong = (newVal.length > 5);
+            }
+        },
+        data: {
+            message: 'Hello',
+            error: {
+                require: false,
+                tooLong: false
+            }
+        }
+    })
 </script>
-
-</body>
-</html>
